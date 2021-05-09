@@ -1,0 +1,162 @@
+::-webkit-scrollbar {
+    background-color: #fff;
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #fff;
+}
+::-webkit-scrollbar-track:hover {
+    background-color: #f4f4f4;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #babac0;
+    border-radius: 12px;
+    border: 3px solid #fff;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #a0a0a5;
+    border: 2px solid #f4f4f4;
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+body{
+    min-width: 780px;
+    min-height: 194px;
+}
+
+h1{
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 0.7rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+h1>span {
+    font-size: 1rem;
+    opacity: 0.85;
+}
+
+#tableTransactions, #tableComputations {
+    margin-top: 0.5rem;
+}
+
+#tableTransactions{
+    margin-bottom: 0.8rem;
+}
+
+.table-striped>tbody>tr:nth-of-type(odd) {
+    --bs-table-accent-bg: rgba(0,0,0,0.03);
+}
+
+.table-hover>tbody>tr:hover {
+    --bs-table-accent-bg: rgba(0,0,0,0.06);
+}
+
+.tableDiv {
+    margin-top: 0.8rem;
+}
+
+.checkDiv {
+    border-left: 1px solid #c2c7cc;
+}
+
+.checkDiv>div>label {
+    user-select: none;
+}
+
+.checkDiv>div>input, .d-grid {
+    opacity: 0.75;
+}
+
+.checkDiv>div>input:not(:disabled)+label, .checkDiv>div>input:not(:disabled) {
+    cursor: pointer;
+}
+
+.buyTrans {
+    background-color: rgba(35, 172, 80, 0.1);
+}
+
+.sellTrans {
+    background-color: rgba(241, 67, 47, 0.1);
+}
+
+#noOfTransactions {
+    display: inline-block;
+    padding: 0 0.1rem 0 0.1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #212529;
+    background-clip: padding-box;
+    border-bottom: 2px solid #93989c;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    width: 2rem;
+    text-align: center;
+    appearance: none;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+#noOfTransactions:focus {
+    border-bottom-color: #599dff!important;
+    outline: 0;
+}
+
+.dataTablecustomInput * {
+    width: 100%!important;
+    margin-left: 0!important;
+    margin-bottom: 0!important;
+}
+
+.dataTablecustomInput>div>label {
+  position: relative;
+}
+
+.dataTablecustomInput>div>label:before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    top: 2px;
+    bottom: 0;
+    width: 12px;
+    opacity: 0.5;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='25' height='25' viewBox='0 0 25 25' fill-rule='evenodd'%3E%3Cpath d='M16.036 18.455l2.404-2.405 5.586 5.587-2.404 2.404zM8.5 2C12.1 2 15 4.9 15 8.5S12.1 15 8.5 15 2 12.1 2 8.5 4.9 2 8.5 2zm0-2C3.8 0 0 3.8 0 8.5S3.8 17 8.5 17 17 13.2 17 8.5 13.2 0 8.5 0zM15 16a1 1 0 1 1 2 0 1 1 0 1 1-2 0'%3E%3C/path%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.dataTablecustomInput>div>label>input {
+  padding-left: 28px;
+}
+
+@keyframes spinLoader{
+    0%{
+        transform: rotate(0deg);
+    }
+    50%{
+        transform: rotate(100deg);
+    }
+    100%{
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes colChange{
+    50%{
+        fill:#4a92fe;
+    }
+}
+
+.spinning {
+    animation: 1s linear infinite spinLoader;
+}
+
+h1>svg>path {
+    animation: 3s ease-out infinite colChange;
+}
+
