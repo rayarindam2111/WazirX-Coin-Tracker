@@ -1,24 +1,43 @@
 document.addEventListener('DOMContentLoaded', function () {
 	console.log("popup DOM fully loaded and parsed");
 
+	var checkPageButton = document.getElementById('buttonRefreshData');
+	checkPageButton.addEventListener('click', getTab);
+
+	var coinSelectTimelineName = document.getElementById('selectCoinChart');
+	coinSelectTimelineName.addEventListener('change', function () {
+		coinChartProcess()
+	});
+
+	var coinSelectTimelineDuration = document.getElementById('selectCoinDuration');
+	coinSelectTimelineDuration.addEventListener('change', function () {
+		coinChartProcess()
+	});
+
 	setTimeout(function () {
 		if (document.getElementById('statusText').innerHTML != 'Fetching data...')
 			getTab();
 	}, 600);
 
-	var checkPageButton = document.getElementById('buttonRefreshData');
-	checkPageButton.addEventListener('click', getTab);
+
 }, false);
 
+var scrapedMatrix = [];
+
 var getTab = function () {
-	chrome.tabs.query({
-		active: true,
-		currentWindow: true
-	}, function (tabs) {
-		var tabId = tabs[0].id;
-		console.log('tabID:', tabId);
-		refreshData(tabId);
-	});
+	try {
+		chrome.tabs.query({
+			active: true,
+			currentWindow: true
+		}, function (tabs) {
+			var tabId = tabs[0].id;
+			console.log('tabID:', tabId);
+			refreshData(tabId);
+		});
+	}
+	catch (err) {
+		console.log('error querying tab');
+	}
 }
 
 var refreshData = function (tabId) {
@@ -29,7 +48,7 @@ var refreshData = function (tabId) {
 	document.getElementById('buttonRefreshData').classList.add("btn-success");
 	document.getElementById('statusText').innerHTML = 'Fetching data...';
 	document.querySelector('#buttonRefreshData>svg').classList.add('spinning');
-	
+
 	let limiter = document.getElementById('flexSwitchCheckChecked').checked;
 	let maxTransactions = processNum(document.getElementById('noOfTransactions').value);
 	if (maxTransactions === '-9999999') {
@@ -43,7 +62,7 @@ var refreshData = function (tabId) {
 
 	chrome.tabs.executeScript(tabId,
 		{
-			code: `(${modifyDOM})(${limiter},${maxTransactions});` 
+			code: `(${modifyDOM})(${limiter},${maxTransactions});`
 		},
 		async (emptyPromise) => {
 			const message = new Promise((resolve) => {
@@ -66,6 +85,7 @@ var refreshData = function (tabId) {
 			}
 			else {
 				createMatrix(result);
+				resetChart();
 				document.getElementById('buttonRefreshData').classList.remove("btn-danger");
 				document.getElementById('buttonRefreshData').classList.add("btn-success");
 				document.getElementById('statusText').innerHTML = 'Refresh';
@@ -98,7 +118,7 @@ var modifyDOM = async function (limiter, maxTransactions) {
 			completedOrdersBtn.click();
 			return 0;
 		}
-		catch {
+		catch (err) {
 			return -1;
 		}
 	}
@@ -144,6 +164,7 @@ var modifyDOM = async function (limiter, maxTransactions) {
 				let coinTitle_2Str = orderElemStr + '>div:nth-of-type(1)>div:nth-of-type(1)>span>span:nth-of-type(2)';
 				let coinValPurchasedStr = orderElemStr + '>div:nth-of-type(1)>div:nth-of-type(2)>span>span:nth-of-type(1)';
 				let coinPriceStr = orderElemStr + '>div:nth-of-type(1)>div:nth-of-type(3)>span';
+				let timePurchaseStr = orderElemStr + '>div:nth-of-type(2)>span:nth-of-type(1)';
 
 				let buySell = window.getComputedStyle(
 					document.querySelector(orderElemStr), ':before'
@@ -152,8 +173,9 @@ var modifyDOM = async function (limiter, maxTransactions) {
 				let coinTitle = document.querySelector(coinTitle_1Str).innerHTML.trim().toLowerCase() + '/' + document.querySelector(coinTitle_2Str).innerHTML.trim().toLowerCase();
 				let coinValPurchased = document.querySelector(coinValPurchasedStr).innerHTML;
 				let coinPrice = document.querySelector(coinPriceStr).innerHTML;
+				let timePurchase = document.querySelector(timePurchaseStr).innerHTML;
 
-				data.push({ coin: coinTitle, purchased: coinValPurchased, price: coinPrice, buy: buySell });
+				data.push({ coin: coinTitle, purchased: coinValPurchased, price: coinPrice, buy: buySell, time: timePurchase });
 			}
 			objDiv.scrollTop = 0;
 
@@ -179,7 +201,7 @@ var modifyDOM = async function (limiter, maxTransactions) {
 			input.dispatchEvent(event);
 			return lastValue;
 		}
-		catch {
+		catch (err) {
 			console.log('error clearing filter');
 		}
 	}
@@ -192,7 +214,7 @@ var modifyDOM = async function (limiter, maxTransactions) {
 			var colBtn = document.querySelector(allColsBtnStr + '>label:nth-of-type(' + columnNo + ')');
 			return colBtn;
 		}
-		catch {
+		catch (err) {
 			return -1;
 		}
 	}
@@ -203,7 +225,7 @@ var modifyDOM = async function (limiter, maxTransactions) {
 			colBtn.click();
 			return 0;
 		}
-		catch {
+		catch (err) {
 			return -1;
 		}
 	}
@@ -232,7 +254,7 @@ var modifyDOM = async function (limiter, maxTransactions) {
 			console.log(baseCurrency + ' coins: ', data);
 			return data;
 		}
-		catch {
+		catch (err) {
 			return -1;
 		}
 	}
@@ -362,7 +384,7 @@ var createMatrix = function (data) {
 		let pricePurchased = orderElem['price'];
 		let coinCategory = coinName.split("/")[1] + 'prices';
 		let searchArray = data[coinCategory];
-		cIndex = searchArray.findIndex((element) => { return element['coin'] == coinName; });
+		let cIndex = searchArray.findIndex((element) => { return element['coin'] == coinName; });
 		let priceMarket = data[coinCategory][cIndex]['price'];
 		let perChangeInvestment = 100 * (processNum(priceMarket) - processNum(pricePurchased)) / processNum(pricePurchased);
 		if (perChangeInvestment >= 0)
@@ -385,14 +407,16 @@ var createMatrix = function (data) {
 		}
 
 		matrix.push({
-			coinName: coinName,
-			purchasedAmount: purchasedAmount,
-			pricePurchased: pricePurchased,
+			coinName: coinName,//
+			purchasedAmount: purchasedAmount,//
+			pricePurchased: pricePurchased,//
 			priceMarket: priceMarket,
 			perChangeInvestment: perChangeInvestment,
 			perChangeMarket: data[coinCategory][cIndex]['perchange'].replace(/ /g, ''),
-			buy: orderElem['buy']
+			buy: orderElem['buy'],//
+			time: orderElem['time']//
 		});
+		scrapedMatrix = matrix;
 	});
 
 	console.log('table matrix:', matrix);
@@ -400,6 +424,8 @@ var createMatrix = function (data) {
 	renderTableTransactions(matrix);
 
 	formatMatrix(matrix);
+
+	coinChartListCreate(matrix);
 }
 
 var findCoinIndex = function (coin, arrayToSearch) {
@@ -441,7 +467,6 @@ var formatMatrix = function (matrix) {
 			allOrderedCoinsList[index].moneyLeft -= perPrice;
 			allOrderedCoinsList[index].totalAmountBought += perAmount;
 			allOrderedCoinsList[index].totalPriceBought += perPrice;
-
 		}
 		else {
 			allOrderedCoinsList[index].amountLeft -= perAmount;
@@ -509,7 +534,7 @@ var renderTableTransactions = function (matrix) {
 	let tableString = `<table class="table table-striped table-hover align-middle">
 						<thead>
 						<tr>
-							<th scope="col">#</th>
+							<th scope="col"></th>
 							<th scope="col">Coin</th>
 							<th scope="col">Amount</th>
 							<th scope="col">B/S. Price</th>
@@ -579,13 +604,13 @@ var renderTableComputations = function (matrix, totalProfitLoss) {
 						<caption>${captionText}</caption>
 						<thead>
 						<tr>
-							<th scope="col">#</th>
+							<th scope="col"></th>
 							<th scope="col">Coin</th>
 							<th scope="col">Net</th>
 							<th scope="col">Av.BP.</th>
 							<th scope="col">Av.SP.</th>
 							<th scope="col">Curr.MP.</th>
-							<th scope="col">Amt.R.</th>
+							<th scope="col">Amt.</th>
 							<th scope="col">Rec.%</th>
 							<th scope="col">P/L</th>
 						</tr>
@@ -641,3 +666,76 @@ var bindInputs = function (settings, json) {
 	});
 }
 // DataTable end
+
+var coinChartProcess = function () {
+	let coin = document.getElementById('selectCoinChart').value.toUpperCase();
+
+	if (coin == "0") return;
+
+	document.getElementById('chartError').classList.add('d-none');
+	document.getElementById('chartContainer').classList.add('d-none');
+	document.getElementById('chartLoading').classList.remove('d-none');
+	document.getElementById('selectCoinChart').setAttribute("disabled", "");
+	document.getElementById('selectCoinDuration').setAttribute("disabled", "");
+
+	let array = [];
+	scrapedMatrix.forEach(row => {
+		let coinName = row.coinName.toUpperCase();
+		if (processNum(row.purchasedAmount) == 0 || coinName !== coin) {
+			return;
+		}
+
+		array.push({
+			buy: row.buy,
+			price: processNum(row.pricePurchased),
+			amount: processNum(row.purchasedAmount),
+			date: row.time
+		});
+	});
+
+	console.log('chart data:', array);
+
+	showChart('chartContainer',
+		function (state) {
+			document.getElementById('chartLoading').classList.add('d-none');
+			document.getElementById('selectCoinChart').removeAttribute("disabled", "");
+			document.getElementById('selectCoinDuration').removeAttribute("disabled", "");
+			if (state) {
+				document.getElementById('chartError').classList.add('d-none');
+				document.getElementById('chartContainer').classList.remove('d-none');
+			}
+			else {
+				document.getElementById('chartContainer').classList.add('d-none');
+				document.getElementById('chartError').classList.remove('d-none');
+			}
+			console.log('chart success:', state)
+		},
+		array,
+		coin,
+		document.getElementById('selectCoinDuration').value);
+}
+
+var coinChartListCreate = function (matrix) {
+	let dat = '<option selected value="0">Select coin</option>';
+
+	let allOrderedCoinsList = [];
+	matrix.forEach(singleCoin => {
+		if (!checkIfCoinIsAdded(singleCoin.coinName, allOrderedCoinsList) && processNum(singleCoin.purchasedAmount) != 0) {
+			allOrderedCoinsList.push({
+				coinName: singleCoin.coinName
+			});
+			let name = singleCoin.coinName.toUpperCase();
+			dat += `<option value="${name}">${name}</option>`;
+		}
+	});
+
+	document.getElementById('selectCoinChart').innerHTML = dat;
+}
+
+var resetChart = function () {
+	chart && chart.dispose();
+	document.getElementById('chartContainer').innerHTML = '';
+	document.getElementById('chartContainer').classList.add('d-none');
+	document.getElementById('chartLoading').classList.add('d-none');
+	document.getElementById('chartError').classList.add('d-none');
+}

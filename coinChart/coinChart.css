@@ -1,0 +1,7 @@
+text {
+    font-family: inherit!important;
+}
+
+.anychart-plot-controls-hidden {
+    display: none!important;
+}

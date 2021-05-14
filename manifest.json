@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "WazirX Coin Tracker",
   "author": "Arindam Ray",
-  "version": "1.0.8",
+  "version": "1.1.2",
   "description": "This extension tabulates current coin prices & profit/loss incurred against the prices at which they were purchased.",
   "browser_action": {
     "default_icon": "icon.png",

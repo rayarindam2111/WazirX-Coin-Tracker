@@ -12,7 +12,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #babac0;
+    background-color: #c5c5ca;
     border-radius: 12px;
     border: 3px solid #fff;
 }
@@ -26,8 +26,8 @@
 }
 
 body{
-    min-width: 780px;
-    min-height: 194px;
+    min-width: 800px;
+    overflow-y: overlay;
 }
 
 h1{
@@ -43,12 +43,20 @@ h1>span {
     opacity: 0.85;
 }
 
-#tableTransactions, #tableComputations {
+#tableTransactions, #tableComputations, #tableTimeline {
     margin-top: 0.5rem;
+    margin-bottom: 0.8rem;
 }
 
-#tableTransactions{
-    margin-bottom: 0.8rem;
+#chartLoading {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+#chartError {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
 .table-striped>tbody>tr:nth-of-type(odd) {
@@ -110,7 +118,7 @@ h1>span {
 }
 
 .dataTablecustomInput * {
-    width: 100%!important;
+    width: calc(100% - 0.12rem)!important;
     margin-left: 0!important;
     margin-bottom: 0!important;
 }
@@ -160,3 +168,8 @@ h1>svg>path {
     animation: 3s ease-out infinite colChange;
 }
 
+#chartContainer {
+    margin-top: 5px;
+    min-height: 360px;
+    height: calc(100vh - 248px);
+}
