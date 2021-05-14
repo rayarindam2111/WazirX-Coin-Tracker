@@ -71,7 +71,7 @@ var showChartMain = async function (containerID, completed, buySellInfo, coin, i
     let notEnoughData = false;
 
     if (buySellArray.length > 0 && getTimeInt(buySellArray[0].date) < candleData.ts[0]) {
-        console.log('not enough data');
+        // not enough data;
         notEnoughData = true;
     }
     while (buySellArray.length > 0 && getTimeInt(buySellArray[0].date) < candleData.ts[0])
@@ -123,9 +123,6 @@ var showChartMain = async function (containerID, completed, buySellInfo, coin, i
 
         fdata += (`"${date}","${open}","${high}","${low}","${close}","${myperfPerCoin}","${myperfRecov}","${volume}"\n`);
     }
-
-    console.log(buyLog);
-    console.log(sellLog);
 
     anychart.onDocumentReady(function () {
         let dataTable = anychart.data.table();
