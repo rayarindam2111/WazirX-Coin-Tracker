@@ -163,18 +163,18 @@ var showChartMain = async function (containerID, completed, buySellInfo, coin, i
 
         let series_marker_buy = chart.plot(0).marker(mapping_marker_bPrice);
         series_marker_buy.name("Buy");
-        series_marker_buy.normal().type("circle");
-        series_marker_buy.normal().size(7);
-        series_marker_buy.normal().fill("#00cc99", 0.8);
-        series_marker_buy.normal().stroke("#0048ff", 2);
+        series_marker_buy.normal().type("triangle-up");
+        series_marker_buy.normal().size(8.2);
+        series_marker_buy.normal().fill("#00cc44", 0.8);
+        series_marker_buy.normal().stroke("#0048ff", 1.4);
         series_marker_buy.zIndex(200);
 
         let series_marker_sell = chart.plot(0).marker(mapping_marker_sPrice);
         series_marker_sell.name("Sell");
-        series_marker_sell.normal().type("circle");
-        series_marker_sell.normal().size(9);
+        series_marker_sell.normal().type("triangle-down");
+        series_marker_sell.normal().size(8.2);
         series_marker_sell.normal().fill("#ff2a2a", 0.8);
-        series_marker_sell.normal().stroke("#3a44ff", 3);
+        series_marker_sell.normal().stroke("#3a44ff", 1.4);
         series_marker_sell.zIndex(199);
 
         chart.scroller().xAxis(false);

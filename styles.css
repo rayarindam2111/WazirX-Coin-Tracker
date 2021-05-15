@@ -173,3 +173,8 @@ h1>svg>path {
     min-height: 360px;
     height: calc(100vh - 248px);
 }
+
+td.coinName {
+    color: #054096;
+    cursor: pointer;
+}

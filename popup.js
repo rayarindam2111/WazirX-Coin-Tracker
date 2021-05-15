@@ -426,6 +426,8 @@ var createMatrix = function (data) {
 	formatMatrix(matrix);
 
 	coinChartListCreate(matrix);
+
+	attachChartListeners();
 }
 
 var findCoinIndex = function (coin, arrayToSearch) {
@@ -554,7 +556,7 @@ var renderTableTransactions = function (matrix) {
 		let colorClassMarket = isNegative(row.perChangeMarket) ? 'text-danger' : 'text-success';
 		tableString += `<tr class="${colorBuy}">
 						<th scope="row">${++count}</th>
-						<td>${row.coinName.toUpperCase()}</td>
+						<td class="coinName">${row.coinName.toUpperCase()}</td>
 						<td data-order="${processNum(row.purchasedAmount)}">${row.purchasedAmount}</td>
 						<td data-order="${processNum(row.pricePurchased)}">${row.pricePurchased}</td>
 						<td data-order="${processNum(row.priceMarket)}">${row.priceMarket}</td>
@@ -626,7 +628,7 @@ var renderTableComputations = function (matrix, totalProfitLoss) {
 		let colorRecovPercent = row.recovPercent == '-' ? '' : isNegative(row.recovPercent) ? 'text-danger' : 'text-success';
 		tableString += `<tr>
 						<th scope="row">${++count}</th>
-						<td>${row.coinName.toUpperCase()}</td>
+						<td class="coinName">${row.coinName.toUpperCase()}</td>
 						<td class="${colorMoneySaved}" data-order="${processNum(row.moneyLeft)}">${row.moneyLeft}</td>
 						<td data-order="${processNum(row.avgPriceBought)}">${row.avgPriceBought}</td>
 						<td data-order="${processNum(row.avgPriceSold)}">${row.avgPriceSold}</td>
@@ -738,4 +740,21 @@ var resetChart = function () {
 	document.getElementById('chartContainer').classList.add('d-none');
 	document.getElementById('chartLoading').classList.add('d-none');
 	document.getElementById('chartError').classList.add('d-none');
+}
+
+var attachChartListeners = function () {
+	let elements = document.getElementsByClassName("coinName");
+
+	let coinTimelineSwitch = function () {
+		let attribute = this.innerHTML;
+		let elem = document.getElementById("selectCoinChart");
+		elem.value = attribute;
+		elem.dispatchEvent(new Event('change'));
+		var triggerEl = document.getElementById('timeline-tab')
+		new bootstrap.Tab(triggerEl).show()
+	};
+
+	for (let i = 0; i < elements.length; i++) {
+		elements[i].addEventListener('click', coinTimelineSwitch, false);
+	}
 }
