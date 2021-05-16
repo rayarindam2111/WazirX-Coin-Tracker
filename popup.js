@@ -1,17 +1,45 @@
 document.addEventListener('DOMContentLoaded', function () {
 	console.log("popup DOM fully loaded and parsed");
 
-	var checkPageButton = document.getElementById('buttonRefreshData');
+	try {
+		chrome.storage.sync.get('chartInterval', function (data) {
+			data.chartInterval && (coinSelectTimelineDuration.value = data.chartInterval);
+		});
+		chrome.storage.sync.get('limiter', function (data) {
+			data.limiter && (limiterSwitch.checked = data.limiter);
+		});
+		chrome.storage.sync.get('noOfTransactions', function (data) {
+			data.noOfTransactions && (noOfTransactionsVal.value = data.noOfTransactions);
+		});
+		console.log('settings loaded');
+	} catch (err) {
+		console.log('error retrieving settings');
+	}
+
+	let checkPageButton = document.getElementById('buttonRefreshData');
 	checkPageButton.addEventListener('click', getTab);
 
-	var coinSelectTimelineName = document.getElementById('selectCoinChart');
+	let coinSelectTimelineName = document.getElementById('selectCoinChart');
 	coinSelectTimelineName.addEventListener('change', function () {
-		coinChartProcess()
+		coinChartProcess();
 	});
 
-	var coinSelectTimelineDuration = document.getElementById('selectCoinDuration');
+	let coinSelectTimelineDuration = document.getElementById('selectCoinDuration');
 	coinSelectTimelineDuration.addEventListener('change', function () {
-		coinChartProcess()
+		storeSetting('chartInterval', this.value);
+		coinChartProcess();
+	});
+
+	let limiterSwitch = document.getElementById('flexSwitchCheckChecked');
+	limiterSwitch.addEventListener('change', function () {
+		storeSetting('limiter', this.checked);
+	});
+
+	let noOfTransactionsVal = document.getElementById('noOfTransactions');
+	noOfTransactionsVal.addEventListener('change', function () {
+		let maxTransactions = processNum(this.value);
+		this.value = ((maxTransactions === '-99999999') ? 30 : Math.abs(Math.round(maxTransactions))) || 30;
+		storeSetting('noOfTransactions', this.value);
 	});
 
 	setTimeout(function () {
@@ -51,12 +79,12 @@ var refreshData = function (tabId) {
 
 	let limiter = document.getElementById('flexSwitchCheckChecked').checked;
 	let maxTransactions = processNum(document.getElementById('noOfTransactions').value);
-	if (maxTransactions === '-9999999') {
+	if (maxTransactions === '-99999999') {
 		document.getElementById('noOfTransactions').value = 30;
 		maxTransactions = 30;
 	}
 	else {
-		maxTransactions = Math.abs(Math.round(maxTransactions));
+		maxTransactions = Math.abs(Math.round(maxTransactions)) || 30;
 		document.getElementById('noOfTransactions').value = maxTransactions;
 	}
 
@@ -756,5 +784,15 @@ var attachChartListeners = function () {
 
 	for (let i = 0; i < elements.length; i++) {
 		elements[i].addEventListener('click', coinTimelineSwitch, false);
+	}
+}
+
+var storeSetting = function (property, value) {
+	try {
+		let setting = {};
+		setting[property] = value;
+		chrome.storage.sync.set(setting);
+	} catch (err) {
+		console.log('error in storing setting');
 	}
 }
