@@ -192,7 +192,7 @@ var modifyDOM = async function (limiter, maxTransactions) {
 				let coinTitle_2Str = orderElemStr + '>div:nth-of-type(1)>div:nth-of-type(1)>span>span:nth-of-type(2)';
 				let coinValPurchasedStr = orderElemStr + '>div:nth-of-type(1)>div:nth-of-type(2)>span>span:nth-of-type(1)';
 				let coinPriceStr = orderElemStr + '>div:nth-of-type(1)>div:nth-of-type(3)>span';
-				let timePurchaseStr = orderElemStr + '>div:nth-of-type(2)>span:nth-of-type(1)';
+				let timePurchaseStr = orderElemStr + '>div:nth-last-child(1)>span:nth-of-type(1)';
 
 				let buySell = window.getComputedStyle(
 					document.querySelector(orderElemStr), ':before'
