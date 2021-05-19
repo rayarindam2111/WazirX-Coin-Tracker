@@ -78,8 +78,6 @@ var showChartMain = async function (containerID, completed, buySellInfo, coin, i
     while (buySellArray.length > 0 && getTimeInt(buySellArray[0].date) < candleData.ts[0])
         buySellArray.splice(0, 1);
 
-
-
     for (let r = 0; r < candleData.ts.length; r++) {
         let date = new Date(candleData.ts[r]);
         let open = candleData.open[r];
@@ -129,7 +127,6 @@ var showChartMain = async function (containerID, completed, buySellInfo, coin, i
             myperfRecov = firstrun ? '' : roundoff(recovery, decimalPoints);
 
         lastamount = amtBought - amtSold;
-
 
         fdata += (`"${date}","${open}","${high}","${low}","${close}","${myperfPerCoin}","${myperfRecov}","${volume}"\n`);
     }
