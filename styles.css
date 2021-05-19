@@ -83,6 +83,10 @@ h1>span {
     opacity: 0.75;
 }
 
+.checkDiv>div>input:not(:checked) {
+    opacity: 1;
+}
+
 .checkDiv>div>input:not(:disabled)+label, .checkDiv>div>input:not(:disabled) {
     cursor: pointer;
 }

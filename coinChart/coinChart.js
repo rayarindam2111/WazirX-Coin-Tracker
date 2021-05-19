@@ -69,6 +69,7 @@ var showChartMain = async function (containerID, completed, buySellInfo, coin, i
     let totSellP = 0;
     let perCoinPriceImprove = 0;
     let notEnoughData = false;
+    let lastamount = 0;
 
     if (buySellArray.length > 0 && getTimeInt(buySellArray[0].date) < candleData.ts[0]) {
         // not enough data;
@@ -76,6 +77,8 @@ var showChartMain = async function (containerID, completed, buySellInfo, coin, i
     }
     while (buySellArray.length > 0 && getTimeInt(buySellArray[0].date) < candleData.ts[0])
         buySellArray.splice(0, 1);
+
+
 
     for (let r = 0; r < candleData.ts.length; r++) {
         let date = new Date(candleData.ts[r]);
@@ -112,14 +115,21 @@ var showChartMain = async function (containerID, completed, buySellInfo, coin, i
         }
 
         let moneyIfSellNow = close * (amtBought - amtSold);
-        let recovery = close * (totSellP + moneyIfSellNow) / (totBuyP);
+        // let recovery = close * (totSellP + moneyIfSellNow) / (totBuyP);
+        let recovery = close + ((totSellP + moneyIfSellNow - totBuyP) / amtBought);
 
         let decimalPoints = countDecimals(close);
         let myperfRecov = '';
 
         let myperfPerCoin = firstrun ? '' : roundoff(close + perCoinPriceImprove, decimalPoints);
-        if ((amtBought - amtSold) > 0 && (totSellP - totBuyP) < 0)
+        // if ((amtBought - amtSold) > 0 && (totSellP - totBuyP) < 0)
+        //    myperfRecov = firstrun ? '' : roundoff(recovery, decimalPoints);
+
+        if ((amtBought - amtSold > 0) || (lastamount > 0))
             myperfRecov = firstrun ? '' : roundoff(recovery, decimalPoints);
+
+        lastamount = amtBought - amtSold;
+
 
         fdata += (`"${date}","${open}","${high}","${low}","${close}","${myperfPerCoin}","${myperfRecov}","${volume}"\n`);
     }
